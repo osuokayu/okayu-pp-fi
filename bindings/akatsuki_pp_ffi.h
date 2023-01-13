@@ -13,14 +13,21 @@ extern "C" {
 
 
 
-typedef struct calculateresult
+typedef struct calculateperformanceresult
     {
     double pp;
     double stars;
-    } calculateresult;
+    } calculateperformanceresult;
+
+///Option type containing boolean flag and maybe valid data.
+typedef struct optionu32
+    {
+    uint32_t t;
+    uint8_t is_some;
+    } optionu32;
 
 
-calculateresult calculate_score(const char* beatmap_path, uint32_t mode, uint32_t mods, uint32_t max_combo, double accuracy, uint32_t miss_count);
+calculateperformanceresult calculate_score(const int8_t* beatmap_path, uint32_t mode, uint32_t mods, uint32_t max_combo, double accuracy, uint32_t miss_count, optionu32 passed_objects);
 
 
 #ifdef __cplusplus

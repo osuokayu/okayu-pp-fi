@@ -20,17 +20,49 @@ namespace My.Company
 
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "calculate_score")]
-        public static extern CalculateResult calculate_score(string beatmap_path, uint mode, uint mods, uint max_combo, double accuracy, uint miss_count);
+        public static extern CalculatePerformanceResult calculate_score(ref sbyte beatmap_path, uint mode, uint mods, uint max_combo, double accuracy, uint miss_count, Optionu32 passed_objects);
 
     }
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct CalculateResult
+    public partial struct CalculatePerformanceResult
     {
         public double pp;
         public double stars;
     }
+
+    ///Option type containing boolean flag and maybe valid data.
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct Optionu32
+    {
+        ///Element that is maybe valid.
+        uint t;
+        ///Byte where `1` means element `t` is valid.
+        byte is_some;
+    }
+
+    public partial struct Optionu32
+    {
+        public static Optionu32 FromNullable(uint? nullable)
+        {
+            var result = new Optionu32();
+            if (nullable.HasValue)
+            {
+                result.is_some = 1;
+                result.t = nullable.Value;
+            }
+
+            return result;
+        }
+
+        public uint? ToNullable()
+        {
+            return this.is_some == 1 ? this.t : (uint?)null;
+        }
+    }
+
 
 
 

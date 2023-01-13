@@ -10,16 +10,14 @@ def init_lib(path):
     global c_lib
     c_lib = ctypes.cdll.LoadLibrary(path)
 
-    c_lib.calculate_score.argtypes = [ctypes.POINTER(ctypes.c_char), ctypes.c_uint32, ctypes.c_uint32, ctypes.c_uint32, ctypes.c_double, ctypes.c_uint32]
+    c_lib.calculate_score.argtypes = [ctypes.POINTER(ctypes.c_int8), ctypes.c_uint32, ctypes.c_uint32, ctypes.c_uint32, ctypes.c_double, ctypes.c_uint32, Optionu32]
 
-    c_lib.calculate_score.restype = CalculateResult
+    c_lib.calculate_score.restype = CalculatePerformanceResult
 
 
 
-def calculate_score(beatmap_path: str, mode: int, mods: int, max_combo: int, accuracy: float, miss_count: int) -> CalculateResult:
-    if not hasattr(beatmap_path, "__ctypes_from_outparam__"):
-        beatmap_path = ctypes.cast(beatmap_path, ctypes.POINTER(ctypes.c_char))
-    return c_lib.calculate_score(beatmap_path, mode, mods, max_combo, accuracy, miss_count)
+def calculate_score(beatmap_path: ctypes.POINTER(ctypes.c_int8), mode: int, mods: int, max_combo: int, accuracy: float, miss_count: int, passed_objects: Optionu32) -> CalculatePerformanceResult:
+    return c_lib.calculate_score(beatmap_path, mode, mods, max_combo, accuracy, miss_count, passed_objects)
 
 
 
@@ -62,7 +60,7 @@ class _Iter(object):
         return rval
 
 
-class CalculateResult(ctypes.Structure):
+class CalculatePerformanceResult(ctypes.Structure):
 
     # These fields represent the underlying C data layout
     _fields_ = [
@@ -91,6 +89,31 @@ class CalculateResult(ctypes.Structure):
     @stars.setter
     def stars(self, value: float):
         return ctypes.Structure.__set__(self, "stars", value)
+
+
+class Optionu32(ctypes.Structure):
+    """May optionally hold a value."""
+
+    _fields_ = [
+        ("_t", ctypes.c_uint32),
+        ("_is_some", ctypes.c_uint8),
+    ]
+
+    @property
+    def value(self) -> ctypes.c_uint32:
+        """Returns the value if it exists, or None."""
+        if self._is_some == 1:
+            return self._t
+        else:
+            return None
+
+    def is_some(self) -> bool:
+        """Returns true if the value exists."""
+        return self._is_some == 1
+
+    def is_none(self) -> bool:
+        """Returns true if the value does not exist."""
+        return self._is_some != 0
 
 
 
