@@ -1,0 +1,17 @@
+[package]
+name = "akatsuki-pp-ffi"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+interoptopus = "0.14.14"
+akatsuki-pp = { path = "./akatsuki-pp-rs" }
+
+[dev-dependencies]
+interoptopus_backend_csharp = "0.14.14"
+interoptopus_backend_c = "0.14.13"
+interoptopus_backend_cpython = "0.14.14"
