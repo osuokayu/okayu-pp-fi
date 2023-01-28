@@ -61,12 +61,13 @@ pub unsafe extern "C" fn calculate_score(
         calculator = calculator
             .mods(mods)
             .combo(max_combo as usize)
-            .misses(miss_count as usize)
-            .accuracy(accuracy as f32);
+            .misses(miss_count as usize);
 
         if let Some(passed_objects) = passed_objects.into_option() {
             calculator = calculator.passed_objects(passed_objects as usize);
         }
+        
+        calculator = calculator.accuracy(accuracy as f32);
 
         let rosu_result = calculator.calculate();
         CalculatePerformanceResult::from_rx_attributes(rosu_result)
@@ -82,12 +83,13 @@ pub unsafe extern "C" fn calculate_score(
             })
             .mods(mods)
             .combo(max_combo as usize)
-            .n_misses(miss_count as usize)
-            .accuracy(accuracy);
+            .n_misses(miss_count as usize);
 
         if let Some(passed_objects) = passed_objects.into_option() {
             calculator = calculator.passed_objects(passed_objects as usize);
         }
+        
+        calculator = calculator.accuracy(accuracy);
 
         let rosu_result = calculator.calculate();
         CalculatePerformanceResult::from_attributes(rosu_result)
