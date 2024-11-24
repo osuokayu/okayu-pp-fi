@@ -1,6 +1,8 @@
 use akatsuki_pp::{
+    any::PerformanceAttributes,
+    model::mode::GameMode,
     osu_2019::{stars::OsuPerformanceAttributes, OsuPP},
-    AnyPP, Beatmap, GameMode, PerformanceAttributes,
+    Beatmap,
 };
 use interoptopus::{
     extra_type, ffi_function, ffi_type, function, patterns::option::FFIOption, Inventory,
@@ -57,38 +59,37 @@ pub unsafe extern "C" fn calculate_score(
 
     // osu!std rx
     if mode == 0 && mods & 128 > 0 {
-        let mut calculator = OsuPP::new(&beatmap);
-        calculator = calculator
-            .mods(mods)
-            .combo(max_combo as usize)
-            .misses(miss_count as usize);
+        let mut calculator = OsuPP::from_map(&beatmap);
+        calculator = calculator.mods(mods).combo(max_combo).misses(miss_count);
 
         if let Some(passed_objects) = passed_objects.into_option() {
-            calculator = calculator.passed_objects(passed_objects as usize);
+            calculator = calculator.passed_objects(passed_objects);
         }
-        
+
         calculator = calculator.accuracy(accuracy as f32);
 
         let rosu_result = calculator.calculate();
         CalculatePerformanceResult::from_rx_attributes(rosu_result)
     } else {
-        let mut calculator = AnyPP::new(&beatmap);
-        calculator = calculator
-            .mode(match mode {
+        let mut calculator = beatmap
+            .performance()
+            .try_mode(match mode {
                 0 => GameMode::Osu,
                 1 => GameMode::Taiko,
                 2 => GameMode::Catch,
                 3 => GameMode::Mania,
                 _ => panic!("Invalid mode"),
             })
+            .unwrap()
             .mods(mods)
-            .combo(max_combo as usize)
-            .n_misses(miss_count as usize);
+            .lazer(false)
+            .combo(max_combo)
+            .misses(miss_count);
 
         if let Some(passed_objects) = passed_objects.into_option() {
-            calculator = calculator.passed_objects(passed_objects as usize);
+            calculator = calculator.passed_objects(passed_objects);
         }
-        
+
         calculator = calculator.accuracy(accuracy);
 
         let rosu_result = calculator.calculate();
