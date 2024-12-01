@@ -17,17 +17,42 @@ typedef struct calculateperformanceresult
     {
     double pp;
     double stars;
+    double ar;
+    double od;
+    uint32_t max_combo;
     } calculateperformanceresult;
+
+///Option type containing boolean flag and maybe valid data.
+typedef struct optionf64
+    {
+    ///Element that is maybe valid.
+    double t;
+    ///Byte where `1` means element `t` is valid.
+    uint8_t is_some;
+    } optionf64;
 
 ///Option type containing boolean flag and maybe valid data.
 typedef struct optionu32
     {
+    ///Element that is maybe valid.
     uint32_t t;
+    ///Byte where `1` means element `t` is valid.
     uint8_t is_some;
     } optionu32;
 
+///A pointer to an array of data someone else owns which may not be modified.
+typedef struct sliceu8
+    {
+    ///Pointer to start of immutable data.
+    const uint8_t* data;
+    ///Number of elements.
+    uint64_t len;
+    } sliceu8;
 
-calculateperformanceresult calculate_score(const int8_t* beatmap_path, uint32_t mode, uint32_t mods, uint32_t max_combo, double accuracy, uint32_t miss_count, optionu32 passed_objects);
+
+calculateperformanceresult calculate_performance_from_path(const int8_t* beatmap_path, uint32_t mode, uint32_t mods, uint32_t max_combo, optionf64 accuracy, optionu32 count_300, optionu32 count_100, optionu32 count_50, uint32_t miss_count, optionu32 passed_objects);
+
+calculateperformanceresult calculate_performance_from_bytes(sliceu8 beatmap_bytes, uint32_t mode, uint32_t mods, uint32_t max_combo, optionf64 accuracy, optionu32 count_300, optionu32 count_100, optionu32 count_50, uint32_t miss_count, optionu32 passed_objects);
 
 
 #ifdef __cplusplus

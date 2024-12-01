@@ -19,8 +19,11 @@ namespace My.Company
         }
 
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "calculate_score")]
-        public static extern CalculatePerformanceResult calculate_score(ref sbyte beatmap_path, uint mode, uint mods, uint max_combo, double accuracy, uint miss_count, Optionu32 passed_objects);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "calculate_performance_from_path")]
+        public static extern CalculatePerformanceResult calculate_performance_from_path(ref sbyte beatmap_path, uint mode, uint mods, uint max_combo, Optionf64 accuracy, Optionu32 count_300, Optionu32 count_100, Optionu32 count_50, uint miss_count, Optionu32 passed_objects);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "calculate_performance_from_bytes")]
+        public static extern CalculatePerformanceResult calculate_performance_from_bytes(Sliceu8 beatmap_bytes, uint mode, uint mods, uint max_combo, Optionf64 accuracy, Optionu32 count_300, Optionu32 count_100, Optionu32 count_50, uint miss_count, Optionu32 passed_objects);
 
     }
 
@@ -30,7 +33,101 @@ namespace My.Company
     {
         public double pp;
         public double stars;
+        public double ar;
+        public double od;
+        public uint max_combo;
     }
+
+    ///A pointer to an array of data someone else owns which may not be modified.
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct Sliceu8
+    {
+        ///Pointer to start of immutable data.
+        IntPtr data;
+        ///Number of elements.
+        ulong len;
+    }
+
+    public partial struct Sliceu8 : IEnumerable<byte>
+    {
+        public Sliceu8(GCHandle handle, ulong count)
+        {
+            this.data = handle.AddrOfPinnedObject();
+            this.len = count;
+        }
+        public Sliceu8(IntPtr handle, ulong count)
+        {
+            this.data = handle;
+            this.len = count;
+        }
+        public byte this[int i]
+        {
+            get
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                var size = Marshal.SizeOf(typeof(byte));
+                var ptr = new IntPtr(data.ToInt64() + i * size);
+                return Marshal.PtrToStructure<byte>(ptr);
+            }
+        }
+        public byte[] Copied
+        {
+            get
+            {
+                var rval = new byte[len];
+                for (var i = 0; i < (int) len; i++) {
+                    rval[i] = this[i];
+                }
+                return rval;
+            }
+        }
+        public int Count => (int) len;
+        public IEnumerator<byte> GetEnumerator()
+        {
+            for (var i = 0; i < (int)len; ++i)
+            {
+                yield return this[i];
+            }
+        }
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
+        }
+    }
+
+
+    ///Option type containing boolean flag and maybe valid data.
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct Optionf64
+    {
+        ///Element that is maybe valid.
+        double t;
+        ///Byte where `1` means element `t` is valid.
+        byte is_some;
+    }
+
+    public partial struct Optionf64
+    {
+        public static Optionf64 FromNullable(double? nullable)
+        {
+            var result = new Optionf64();
+            if (nullable.HasValue)
+            {
+                result.is_some = 1;
+                result.t = nullable.Value;
+            }
+
+            return result;
+        }
+
+        public double? ToNullable()
+        {
+            return this.is_some == 1 ? this.t : (double?)null;
+        }
+    }
+
 
     ///Option type containing boolean flag and maybe valid data.
     [Serializable]
