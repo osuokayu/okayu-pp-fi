@@ -1,5 +1,5 @@
 [package]
-name = "akatsuki-pp-ffi"
+name = "okayu-pp-ffi"
 version = "0.1.0"
 edition = "2021"
 publish = false
@@ -9,7 +9,7 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 interoptopus = "0.14.14"
-akatsuki-pp = { path = "./akatsuki-pp-rs" }
+okayu-pp = { path = "./okayu-pp-rs" }
 
 [dev-dependencies]
 interoptopus_backend_csharp = "0.14.14"

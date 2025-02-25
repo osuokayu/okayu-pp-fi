@@ -12,7 +12,7 @@ namespace My.Company
 {
     public static partial class Interop
     {
-        public const string NativeLib = "akatsuki_pp";
+        public const string NativeLib = "okayu_pp";
 
         static Interop()
         {

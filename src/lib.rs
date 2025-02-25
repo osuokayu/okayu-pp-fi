@@ -1,4 +1,4 @@
-use akatsuki_pp::{
+use okayu_pp::{
     any::PerformanceAttributes,
     model::mode::GameMode,
     osu_2019::{stars::OsuPerformanceAttributes, OsuPP},
@@ -206,7 +206,7 @@ fn generate_csharp_bindings() {
     let inventory = my_inventory();
 
     let config = Config {
-        dll_name: "akatsuki_pp".to_string(),
+        dll_name: "okayu_pp".to_string(),
         ..Config::default()
     };
 
@@ -223,12 +223,12 @@ fn generate_c_bindings() {
     let inventory = my_inventory();
 
     let config = Config {
-        ifndef: "akatsuki_pp".to_string(),
+        ifndef: "okayu_pp".to_string(),
         ..Config::default()
     };
 
     Generator::new(config, inventory)
-        .write_file("bindings/akatsuki_pp_ffi.h")
+        .write_file("bindings/okayu_pp_ffi.h")
         .unwrap();
 }
 
@@ -242,6 +242,6 @@ fn generate_cpython_bindings() {
     let config = Config::default();
 
     Generator::new(config, inventory)
-        .write_file("bindings/akatsuki_pp_ffi.py")
+        .write_file("bindings/okayu_pp_ffi.py")
         .unwrap();
 }
